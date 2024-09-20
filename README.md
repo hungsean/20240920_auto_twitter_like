@@ -19,7 +19,6 @@ A Python-based automation tool using Selenium to download images from a specifie
   - [Usage](#usage)
     - [1. Save Cookies](#1-save-cookies)
     - [2. Run the Main Script](#2-run-the-main-script)
-  - [Automating Initialization](#automating-initialization)
   - [Troubleshooting](#troubleshooting)
   - [License](#license)
 
@@ -153,7 +152,7 @@ python main_withlog.py
 - Logs all activities to both console and log files.
 
 ---
-
+<!--
 ## Automating Initialization
 
 To streamline the setup process, you can create a Windows batch script (`setup.bat`) that automates the activation of the virtual environment and runs the necessary scripts.
@@ -183,6 +182,8 @@ pause
 
 1. Double-click `setup.bat` or run it via Command Prompt.
 2. The script will activate the virtual environment, install dependencies, prompt you to save cookies, and then start the main automation process.
+
+-->
 
 ---
 
