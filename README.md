@@ -42,7 +42,7 @@ A Python-based automation tool using Selenium to download images from a specifie
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/selenium-image-downloader.git
+git clone https://github.com/hungsean/20240920_auto_twitter_like.git
 cd selenium-image-downloader
 ```
 
@@ -110,7 +110,7 @@ MEDIA_DB_PATH=databases/media_data.db
 IMAGES_DIR=images_png
 
 # URL of the likes page
-LIKES_URL=https://x.com/senen_3454/likes
+LIKES_URL=https://x.com/youname/likes
 
 # Directory for logs
 LOGS_DIR=logs
