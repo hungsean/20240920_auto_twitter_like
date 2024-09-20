@@ -1,0 +1,9 @@
+.venv
+.vscode
+chromedriver-win64
+databases
+images_png
+logs
+.env
+to_o1.md
+cookies.pkl
