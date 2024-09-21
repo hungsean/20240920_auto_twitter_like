@@ -10,6 +10,9 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -35,6 +38,7 @@ MEDIA_DB_PATH = os.getenv('MEDIA_DB_PATH', 'databases/media_data.db')
 IMAGES_DIR = os.getenv('IMAGES_DIR', 'images_png')
 LIKES_URL = os.getenv('LIKES_URL', 'https://x.com/senen_3454/likes')
 
+# Initialize the database
 def init_db(db_path):
     logging.info(f"Initializing database at {db_path}")
     os.makedirs(os.path.dirname(db_path), exist_ok=True)
@@ -54,6 +58,7 @@ def init_db(db_path):
     logging.info("Database initialized successfully")
     return conn, cursor
 
+# Insert data into the database
 def insert_media_data(cursor, data):
     try:
         cursor.execute('''
@@ -64,11 +69,13 @@ def insert_media_data(cursor, data):
     except sqlite3.IntegrityError:
         logging.info(f"media_id {data['media_id']} already exists. Skipping insert.")
 
+# Save and close the database
 def save_and_close_db(conn):
     conn.commit()
     conn.close()
     logging.info("Database connection closed")
 
+# Process an <a> tag to extract information
 def process_a_tag(a_tag):
     result = {}
     logging.info("Processing <a> tag")
@@ -82,13 +89,19 @@ def process_a_tag(a_tag):
                 result['post_id'] = href_path[5] if len(href_path) > 5 else None
                 result['photo_index'] = href_path[7] if len(href_path) > 7 else None
 
-        img_tag = a_tag.find_element(By.TAG_NAME, 'img')
-        if img_tag:
-            src = img_tag.get_attribute('src')
-            if src:
-                src_path = src.split('?')[0].split('#')[0].split('/')
-                if len(src_path) > 4:
-                    result['media_id'] = src_path[4] if len(src_path) > 4 else None
+        try:
+            # Explicit wait for <img> tag to load
+            img_tag = WebDriverWait(a_tag, 10).until(
+                EC.presence_of_element_located((By.TAG_NAME, 'img'))
+            )
+            if img_tag:
+                src = img_tag.get_attribute('src')
+                if src:
+                    src_path = src.split('?')[0].split('#')[0].split('/')
+                    if len(src_path) > 4:
+                        result['media_id'] = src_path[4] if len(src_path) > 4 else None
+        except TimeoutException:
+            logging.warning("Timeout waiting for <img> tag in <a> tag")
 
     except Exception as e:
         logging.error(f"Error processing <a> tag: {e}")
@@ -97,6 +110,7 @@ def process_a_tag(a_tag):
     logging.info(f"Processed <a> tag: {result}")
     return result
 
+# Filter <a> tags to find media links
 def filter_a_tags(links):
     logging.info("Filtering <a> tags")
     result_links = []
@@ -109,6 +123,7 @@ def filter_a_tags(links):
     logging.info(f"Filtered {len(result_links)} <a> tags")
     return result_links
 
+# Download image by media ID
 def download_image(image_id):
     logging.info(f"Downloading image {image_id}")
     url = f'https://pbs.twimg.com/media/{image_id}?format=png&name=4096x4096'
@@ -132,6 +147,7 @@ def download_image(image_id):
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to download image {image_id}: {e}")
 
+# Save the filtered data and download images
 def save_data(a_tags):
     logging.info("Saving data")
     filtered_a_tags = filter_a_tags(a_tags)
@@ -139,16 +155,20 @@ def save_data(a_tags):
     if filtered_a_tags:
         conn, cursor = init_db(MEDIA_DB_PATH)
         for a_tag in filtered_a_tags:
-            result = process_a_tag(a_tag)
-            logging.info(f"Result from processing: {result}")
+            try:
+                result = process_a_tag(a_tag)
+                logging.info(f"Result from processing: {result}")
 
-            if result.get('media_id'):
-                insert_media_data(cursor, result)
-                download_image(result['media_id'])
+                if result.get('media_id'):
+                    insert_media_data(cursor, result)
+                    download_image(result['media_id'])
+            except Exception as e:
+                logging.error(f"Error processing link: {e}")
         save_and_close_db(conn)
     else:
         logging.info("No <a> tags found matching criteria")
 
+# Set up the Selenium WebDriver
 def setup_driver():
     chrome_options = Options()
     chrome_options.add_argument('--headless')  # Enable headless mode
@@ -159,6 +179,7 @@ def setup_driver():
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 
+# Main function to control the process
 def main():
     logging.info("Starting the web scraping process")
     driver = setup_driver()
@@ -177,6 +198,11 @@ def main():
         logging.info(f"Navigated to the target page: {LIKES_URL}")
 
         while True:
+
+            # Logging the current page URL
+            current_url = driver.current_url
+            logging.info(f"Current page URL: {current_url}")
+
             time.sleep(5)
             all_a_tags = driver.find_elements(By.TAG_NAME, 'a')
             save_data(all_a_tags)
