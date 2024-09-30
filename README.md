@@ -41,8 +41,7 @@ A Python-based automation tool using Selenium to download images from a specifie
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/hungsean/20240920_auto_twitter_like.git
-cd selenium-image-downloader
+git clone https://github.com/hungsean/20240920_auto_twitter_like.git .
 ```
 
 ### 2. Set Up Virtual Environment
