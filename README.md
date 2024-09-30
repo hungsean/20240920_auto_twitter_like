@@ -49,7 +49,7 @@ git clone https://github.com/hungsean/20240920_auto_twitter_like.git .
 It's recommended to use a virtual environment to manage dependencies.
 
 ```bash
-python -m venv venv
+python -m venv .venv
 ```
 
 Activate the virtual environment:
@@ -57,7 +57,7 @@ Activate the virtual environment:
 - **Command Prompt:**
 
   ```bash
-  venv\Scripts\activate
+  .venv\Scripts\activate
   ```
 
 - **PowerShell:**
