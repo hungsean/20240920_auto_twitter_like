@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/app
+    environment:
+      - TARGET_URL=${TARGET_URL}
+      - COOKIES_FILE=${COOKIES_FILE}
+      - LIKES_URL=${LIKES_URL}
+      - MEDIA_DB_PATH=${MEDIA_DB_PATH}
+      - IMAGES_DIR=${IMAGES_DIR}
+      - LOGS_DIR=${LOGS_DIR}
+    command: python main_withlog.py
+

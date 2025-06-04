@@ -12,13 +12,13 @@ A Python-based automation tool using Selenium to download images from a specifie
     - [1. Clone the Repository](#1-clone-the-repository)
     - [2. Set Up Virtual Environment](#2-set-up-virtual-environment)
     - [3. Install Dependencies](#3-install-dependencies)
-    - [4. Install ChromeDriver](#4-install-chromedriver)
   - [Configuration](#configuration)
     - [Environment Variables](#environment-variables)
       - [`.env` File](#env-file)
   - [Usage](#usage)
     - [1. Save Cookies](#1-save-cookies)
     - [2. Run the Main Script](#2-run-the-main-script)
+  - [Docker](#docker)
   - [Troubleshooting](#troubleshooting)
   - [License](#license)
 
@@ -34,7 +34,7 @@ A Python-based automation tool using Selenium to download images from a specifie
 
 - **Operating System**: Windows
 - **Python**: Version 3.7 or higher
-- **Google Chrome**: Installed on your system
+- **Google Chrome**: Required only when running `save_cookies.py` locally
 
 ## Installation
 
@@ -75,11 +75,8 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Install ChromeDriver
+The appropriate ChromeDriver will be downloaded automatically at runtime.
 
-please download from [here](https://googlechromelabs.github.io/chrome-for-testing/)
-
----
 
 ## Configuration
 
@@ -92,8 +89,8 @@ All configurable paths and settings are managed via environment variables. You c
 Create a `.env` file and add the following configurations:
 
 ```dotenv
-# Path to the ChromeDriver executable
-CHROMEDRIVER_PATH=chromedriver-win64/chromedriver.exe
+# Optional path to a Chrome executable (used by webdriver); defaults to chrome-headless-shell
+CHROME_BINARY=chrome-headless-shell
 
 # URL of the target website
 TARGET_URL=https://x.com/home
@@ -151,6 +148,16 @@ python main_withlog.py
 - Logs all activities to both console and log files.
 
 ---
+## Docker
+
+You can build and run the project using Docker:
+
+```bash
+docker compose build
+docker compose run app
+```
+
+---
 <!--
 ## Automating Initialization
 
@@ -188,8 +195,8 @@ pause
 
 ## Troubleshooting
 
-- **ChromeDriver Version Mismatch:**
-  Ensure that the ChromeDriver version matches your installed Google Chrome version. Mismatched versions can lead to errors.
+- **ChromeDriver Download Issues:**
+  The driver is automatically managed by `webdriver-manager`. Ensure the container has network access during the first run.
 
 - **Environment Variables Not Loaded:**
   Make sure the `.env` file is correctly formatted and located in the project's root directory.
