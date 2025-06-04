@@ -1,10 +1,12 @@
 .venv
 .vscode
-chromedriver-win64
+chromedriver-*
 databases
 images_png
 logs
 .env
+.env.*
 to_o1.md
 cookies.pkl
 startup.bat
+run.sh
