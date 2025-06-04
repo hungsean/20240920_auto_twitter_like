@@ -8,6 +8,7 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -31,12 +32,12 @@ logging.basicConfig(level=logging.INFO,
                     ])
 
 # Environment Variables
-CHROMEDRIVER_PATH = os.getenv('CHROMEDRIVER_PATH', 'chromedriver.exe')
 TARGET_URL = os.getenv('TARGET_URL', 'https://x.com/home')
 COOKIES_FILE = os.getenv('COOKIES_FILE', 'cookies.pkl')
 MEDIA_DB_PATH = os.getenv('MEDIA_DB_PATH', 'databases/media_data.db')
 IMAGES_DIR = os.getenv('IMAGES_DIR', 'images_png')
 LIKES_URL = os.getenv('LIKES_URL', 'https://x.com/senen_3454/likes')
+CHROME_BINARY = os.getenv('CHROME_BINARY', 'chrome-headless-shell')
 
 # Initialize the database
 def init_db(db_path):
@@ -175,7 +176,10 @@ def setup_driver():
     chrome_options.add_argument('--no-sandbox')  # Avoid sandbox issues
     chrome_options.add_argument('--disable-dev-shm-usage')  # Avoid filesystem issues
 
-    service = Service(CHROMEDRIVER_PATH)
+    if CHROME_BINARY:
+        chrome_options.binary_location = CHROME_BINARY
+
+    service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=chrome_options)
     return driver
 

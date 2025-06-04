@@ -3,6 +3,8 @@ import pickle
 import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -21,12 +23,16 @@ logging.basicConfig(level=logging.INFO,
                     ])
 
 def save_cookies():
-    chromedriver_path = os.getenv('CHROMEDRIVER_PATH', 'chromedriver.exe')
     target_url = os.getenv('TARGET_URL', 'https://x.com/home')
     cookies_file = os.getenv('COOKIES_FILE', 'cookies.pkl')
+    chrome_binary = os.getenv('CHROME_BINARY')
 
-    service = Service(chromedriver_path)
-    driver = webdriver.Chrome(service=service)
+    chrome_options = Options()
+    if chrome_binary:
+        chrome_options.binary_location = chrome_binary
+
+    service = Service(ChromeDriverManager().install())
+    driver = webdriver.Chrome(service=service, options=chrome_options)
 
     try:
         logging.info(f"Opening target website: {target_url}")
